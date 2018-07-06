@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://svetob.github.io/fixed/about/</loc>
+    <lastmod>2018-07-06T20:34:45+02:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://svetob.github.io/blog/experiments-over-discussions/</loc>
     <lastmod>2018-07-06T15:51:10+02:00</lastmod>
   </url>
@@ -19,13 +24,19 @@
   </url>
   
   <url>
+    <loc>https://svetob.github.io/fixed/</loc>
+    <lastmod>2018-07-06T20:34:45+02:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://svetob.github.io/tags/</loc>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://svetob.github.io/</loc>
-    <lastmod>2018-07-06T15:51:10+02:00</lastmod>
+    <lastmod>2018-07-06T20:34:45+02:00</lastmod>
     <priority>0</priority>
   </url>
   
