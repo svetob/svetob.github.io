@@ -19,7 +19,7 @@
       <guid>https://svetob.github.io/blog/experiments-over-discussions/</guid>
       <description>Remember the last time you had a long, heated discussion and found a perfect solution? Me neither.
 Wouldn&amp;rsquo;t it be amazing to have a better way to resolve arguments?
-I recall a particularly exhausting discussion that went on for over a month. A few years ago, our team was working on a large scale storage backend. At some point we found a potential issue that could lead to lost updates.</description>
+I recall a particularly exhausting discussion that went on for over a month. Long ago I worked on large scale distributed system. At some point we found a potential issue that could lead to lost updates in our data sets.</description>
     </item>
     
   </channel>
