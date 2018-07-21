@@ -59,11 +59,11 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 
 
     
-    <link rel="stylesheet" href="http://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
-    <link rel="stylesheet" href="http://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
-    <link rel="stylesheet" href="http://tobiasara.com/css/main.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
+    <link rel="stylesheet" href="http://tobiasara.com/css/reset.css?t=2018-07-21%2018%3a00%3a41.73860449%20%2b0200%20CEST%20m%3d%2b0.048628243">
+    <link rel="stylesheet" href="http://tobiasara.com/css/pygments.css?t=2018-07-21%2018%3a00%3a41.73860449%20%2b0200%20CEST%20m%3d%2b0.048628243">
+    <link rel="stylesheet" href="http://tobiasara.com/css/main.css?t=2018-07-21%2018%3a00%3a41.73860449%20%2b0200%20CEST%20m%3d%2b0.048628243">
     
-        <link rel="stylesheet" href="http://tobiasara.com/css/override.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
+        <link rel="stylesheet" href="http://tobiasara.com/css/override.css?t=2018-07-21%2018%3a00%3a41.73860449%20%2b0200%20CEST%20m%3d%2b0.048628243">
     
 
 
@@ -383,7 +383,7 @@ config :logger, :console,
 
 <h1 id="sending-logs-to-logstash-via-tcp">Sending logs to Logstash via TCP</h1>
 
-<p>Now, instead of printing to console, we want to sent these logs to Logstash.</p>
+<p>Now, instead of printing to console, we want to send these logs to Logstash.</p>
 
 <h2 id="setting-up-logstash-with-a-json-consumer">Setting up Logstash with a JSON consumer</h2>
 
@@ -424,13 +424,13 @@ output {
 
 <p>Now we can begin building our TCP connection. Logstash&rsquo;s TCP interface is very simple, all we need to do is open a TCP socket and send newline-delimited JSON messages. But, we also need to nicely handle connection failures, service being unavailable and other expected errors. This should be a common problem, so perhaps there is already a solution available?</p>
 
-<p>Yup - <a href="https://github.com/fishcakez/connection">Connection</a>! This library is a behaviour for connection processes. It will handle connection, disconnection, attempt reconnection on errors and has an optional backoff between attempts. It even comes with a <a href="https://github.com/fishcakez/connection/blob/master/examples/tcp_connection/lib/tcp_connection.ex">TCP connection example</a> right out of the box. Just what we need! We will base our work on this example.</p>
+<p>Yup - <a href="https://github.com/fishcakez/connection">Connection</a>! This library is a behavior for connection processes. It will handle connection, disconnection, attempt reconnection on errors and has an optional backoff between attempts. It even comes with a <a href="https://github.com/fishcakez/connection/blob/master/examples/tcp_connection/lib/tcp_connection.ex">TCP connection example</a> right out of the box. Just what we need! We will base our work on this example.</p>
 
-<p>You can test the example as is and see your logs arrive in logstash:</p>
+<p>You can test the example as is and see your logs arrive in Logstash:</p>
 
 <p><img src="http://tobiasara.com/img/blog/elixir-logstash-json/console_tcpconnection.png" alt="TCPConnection to Logstash" /></p>
 
-<p>Let&rsquo;s modify our code to use this. Let&rsquo;s copy <code>lib/jsonlogger_console.ex</code> and create a new module, <code>JsonLogger.TCP</code> in <code>lib/jsonlogger_tcp.ex</code>. The first step is to launch a TCP connection to our logstash host, with configurable host/port.</p>
+<p>Let&rsquo;s modify our code to use this. Let&rsquo;s copy <code>lib/jsonlogger_console.ex</code> and create a new module, <code>JsonLogger.TCP</code> in <code>lib/jsonlogger_tcp.ex</code>. The first step is to launch a TCP connection to our Logstash host, with configurable host/port.</p>
 
 <pre><code class="language-elixir"># lib/jsonlogger_tcp.ex
 
@@ -505,7 +505,7 @@ config :logger, :logstash,
 
 <p>This also brings us to the topic of handling large log volumes. If we produce logs faster than our backend can handle them, or if Logstash becomes temporarily unavailable, we will be faced with more logs than we can send or keep in memory.</p>
 
-<p>There is no middle ground here - if Logstash becomes unavailable or we produce too much logs too fast, we will have to either <strong>drop logs</strong> or risk <strong>blocking the application</strong> until we can successfully send more logs. Dropping logs when your message buffer fills up is normal. For our use case, it was important not to lose any logs, so we implemented blocking behaviour.</p>
+<p>There is no middle ground here - if Logstash becomes unavailable or we produce too many logs too fast, we will have to either <strong>drop logs</strong> or risk <strong>blocking the application</strong> until we can successfully send more logs. Dropping logs when your message buffer fills up is normal. For our use case, it was important not to lose any logs, so we implemented blocking behavior.</p>
 
 <p>Thus our next and final step is to create a pool of TCP connections, which read messages from a <a href="https://github.com/joekain/BlockingQueue">BlockingQueue</a>. Sizing the connection pool right will increase our throughput to Logstash, and the queue will act as a buffer to handle varying log volumes.</p>
 
@@ -533,7 +533,7 @@ defmodule TCPConnection.Worker do
 end
 </code></pre>
 
-<p>Then we just need to start this worker process when the <code>TCPConnection</code> module intializes, with the following edits:</p>
+<p>Then we just need to start this worker process when the <code>TCPConnection</code> module initializes, with the following edits:</p>
 
 <pre><code class="language-elixir"># lib/connection/tcp.ex
 
@@ -632,7 +632,7 @@ iex(1)&gt; :observer.start()
 
 <h1 id="conclusion">Conclusion</h1>
 
-<p>We saw how to implement an Elixir Logger backend. We used <a href="https://github.com/fishcakez/connection">Connection</a> and its TCP connection example to send logs to Logstash as JSON via TCP. Finally we made our library faster and more resilient by creating a pool of TCP connection workers, reading messages from a <a href="https://github.com/joekain/BlockingQueue">BlockingQueue</a> message buffer.</p>
+<p>We saw how to implement an Elixir Logger backend. We used <a href="https://github.com/fishcakez/connection">Connection</a> and its TCP connection example to send logs to Logstash as JSON via TCP. Finally, we made our library faster and more resilient by creating a pool of TCP connection workers, reading messages from a <a href="https://github.com/joekain/BlockingQueue">BlockingQueue</a> message buffer.</p>
 
 <p>Thanks for reading!</p>
 
