@@ -12,11 +12,11 @@
     
     
     <item>
-      <title>Sending Elixir&#39;s logs to Logstash as JSON</title>
-      <link>http://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/</link>
+      <title>Sending Elixir logs to Logstash as JSON</title>
+      <link>http://tobiasara.com/blog/sending-elixir-logs-to-logstash-as-json/</link>
       <pubDate>Sat, 21 Jul 2018 17:04:34 +0200</pubDate>
       
-      <guid>http://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/</guid>
+      <guid>http://tobiasara.com/blog/sending-elixir-logs-to-logstash-as-json/</guid>
       <description>Adopting Elixir was a pleasure - it fit nicely into our microservice architecture and most of our tech stack. The only missing piece was our ELK-based logging infrastructure, where we sent logs to Logstash formatted in JSON, an easily machine-readable format. As there was no library at the time that did this, I decided to write one myself!
 In this post, we will cover how to create your own Elixir logger backend, how to send JSON logs to Logstash via TCP, unit testing, and strategies for handling log spikes.</description>
     </item>
