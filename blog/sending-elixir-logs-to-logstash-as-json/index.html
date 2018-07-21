@@ -59,11 +59,11 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 
 
     
-    <link rel="stylesheet" href="http://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a28%3a26.388371728%20%2b0200%20CEST%20m%3d%2b0.053355851">
-    <link rel="stylesheet" href="http://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a28%3a26.388371728%20%2b0200%20CEST%20m%3d%2b0.053355851">
-    <link rel="stylesheet" href="http://tobiasara.com/css/main.css?t=2018-07-21%2017%3a28%3a26.388371728%20%2b0200%20CEST%20m%3d%2b0.053355851">
+    <link rel="stylesheet" href="http://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
+    <link rel="stylesheet" href="http://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
+    <link rel="stylesheet" href="http://tobiasara.com/css/main.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
     
-        <link rel="stylesheet" href="http://tobiasara.com/css/override.css?t=2018-07-21%2017%3a28%3a26.388371728%20%2b0200%20CEST%20m%3d%2b0.053355851">
+        <link rel="stylesheet" href="http://tobiasara.com/css/override.css?t=2018-07-21%2017%3a50%3a09.536612917%20%2b0200%20CEST%20m%3d%2b0.048496961">
     
 
 
@@ -232,7 +232,7 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 
 <p>In this post, we will cover how to create your own Elixir logger backend, how to send JSON logs to Logstash via TCP, unit testing, and strategies for handling log spikes.</p>
 
-<p>You can find <strong>logstash-json</strong> on <a href="https://github.com/svetob/logstash-json">GitHub</a>.</p>
+<p>You can find the complete library on <a href="https://github.com/svetob/logstash-json">GitHub</a>.</p>
 
 <h1 id="creating-an-elixir-logging-backend">Creating an Elixir logging backend</h1>
 
@@ -405,9 +405,7 @@ config :logger, :console,
 
 <p><code>docker/logstash.conf</code></p>
 
-<pre><code># docker/logstash.conf
-
-input {
+<pre><code>input {
   tcp {
     port =&gt; 5044
     codec =&gt; json
