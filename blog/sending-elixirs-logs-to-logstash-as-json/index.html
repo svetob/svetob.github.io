@@ -16,7 +16,7 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 <meta property="og:description" content="Adopting Elixir was a pleasure - it fit nicely into our microservice architecture and most of our tech stack. The only missing piece was our ELK-based logging infrastructure, where we sent logs to Logstash formatted in JSON, an easily machine-readable format. As there was no library at the time that did this, I decided to write one myself!
 In this post, we will cover how to create your own Elixir logger backend, how to send JSON logs to Logstash via TCP, unit testing, and strategies for handling log spikes." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="https://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/" />
+<meta property="og:url" content="http://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/" />
 
 
 
@@ -41,7 +41,7 @@ In this post, we will cover how to create your own Elixir logger backend, how to
      Sending Elixir&#39;s logs to Logstash as JSON 
 
 </title>
-<link rel="canonical" href="https://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/">
+<link rel="canonical" href="http://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/">
 
 
 
@@ -59,11 +59,11 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 
 
     
-    <link rel="stylesheet" href="https://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
-    <link rel="stylesheet" href="https://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
-    <link rel="stylesheet" href="https://tobiasara.com/css/main.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
+    <link rel="stylesheet" href="http://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a22%3a06.794258315%20%2b0200%20CEST%20m%3d%2b0.049096809">
+    <link rel="stylesheet" href="http://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a22%3a06.794258315%20%2b0200%20CEST%20m%3d%2b0.049096809">
+    <link rel="stylesheet" href="http://tobiasara.com/css/main.css?t=2018-07-21%2017%3a22%3a06.794258315%20%2b0200%20CEST%20m%3d%2b0.049096809">
     
-        <link rel="stylesheet" href="https://tobiasara.com/css/override.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
+        <link rel="stylesheet" href="http://tobiasara.com/css/override.css?t=2018-07-21%2017%3a22%3a06.794258315%20%2b0200%20CEST%20m%3d%2b0.049096809">
     
 
 
@@ -71,7 +71,7 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 
 <link rel="shortcut icon"
 
-    href="https://tobiasara.com/img/favicon.ico"
+    href="http://tobiasara.com/img/favicon.ico"
 
 >
 
@@ -141,20 +141,20 @@ In this post, we will cover how to create your own Elixir logger backend, how to
                     
                 
                 
-                <a href="https://tobiasara.com/"><img class="avatar" src="https://tobiasara.com/img/avatar_bw_thumb.jpg" srcset="https://tobiasara.com/img/avatar_bw_thumb.jpg 1x"></a>
+                <a href="http://tobiasara.com/"><img class="avatar" src="http://tobiasara.com/img/avatar_bw_thumb.jpg" srcset="http://tobiasara.com/img/avatar_bw_thumb.jpg 1x"></a>
             
-            <a href="https://tobiasara.com/"><div class="name">Tobias Ara Svensson</div></a>
+            <a href="http://tobiasara.com/"><div class="name">Tobias Ara Svensson</div></a>
             
               <h3 class="self-intro">simpler is better</h3>
             
             <nav>
                 <ul>
                     
-                        <li class="nav-blog"><a href="https://tobiasara.com/blog/"><span>Blog</span></a></li>
+                        <li class="nav-blog"><a href="http://tobiasara.com/blog/"><span>Blog</span></a></li>
                     
-                        <li class="nav-code"><a href="https://tobiasara.com/code/"><span>Code</span></a></li>
+                        <li class="nav-code"><a href="http://tobiasara.com/code/"><span>Code</span></a></li>
                     
-                        <li class="nav-about"><a href="https://tobiasara.com/fixed/about/"><span>About</span></a></li>
+                        <li class="nav-about"><a href="http://tobiasara.com/fixed/about/"><span>About</span></a></li>
                     
                 </ul>
             </nav>
@@ -166,13 +166,13 @@ In this post, we will cover how to create your own Elixir logger backend, how to
     <div class="container">
         <div class="content">
         
-            <a href="//github.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/github.svg" alt="github" /></a>
+            <a href="//github.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="http://tobiasara.com/img/github.svg" alt="github" /></a>
         
 
         
 
         
-            <a href="//twitter.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/twitter.svg" alt="twitter" /></a>
+            <a href="//twitter.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="http://tobiasara.com/img/twitter.svg" alt="twitter" /></a>
         
 
 	
@@ -182,7 +182,7 @@ In this post, we will cover how to create your own Elixir logger backend, how to
         
 
         
-            <a href="//linkedin.com/in/svetob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/linkedin.svg" alt="linkedin" /></a>
+            <a href="//linkedin.com/in/svetob" target="_blank" rel="noopener"><img class="icon" src="http://tobiasara.com/img/linkedin.svg" alt="linkedin" /></a>
         
 
         
@@ -214,7 +214,7 @@ In this post, we will cover how to create your own Elixir logger backend, how to
 
 </div>
 
-                    <div class="initials"><a href="https://tobiasara.com/">ad</a></div>
+                    <div class="initials"><a href="http://tobiasara.com/">ad</a></div>
                 </div>
                 <div class="meta">
                     
@@ -375,7 +375,7 @@ config :logger, :console,
 
 <p>&hellip; and then quickly test it with <code>iex -S mix</code>:</p>
 
-<p><img src="https://tobiasara.com/img/blog/elixir-logstash-json/console_loggerbackend.png" alt="Console output" /></p>
+<p><img src="http://tobiasara.com/img/blog/elixir-logstash-json/console_loggerbackend.png" alt="Console output" /></p>
 
 <p>Nice! Not the most human readable format though.</p>
 
@@ -430,7 +430,7 @@ output {
 
 <p>You can test the example as is and see your logs arrive in logstash:</p>
 
-<p><img src="https://tobiasara.com/img/blog/elixir-logstash-json/console_tcpconnection.png" alt="TCPConnection to Logstash" /></p>
+<p><img src="http://tobiasara.com/img/blog/elixir-logstash-json/console_tcpconnection.png" alt="TCPConnection to Logstash" /></p>
 
 <p>Let&rsquo;s modify our code to use this. Let&rsquo;s copy <code>lib/jsonlogger_console.ex</code> and create a new module, <code>JsonLogger.TCP</code> in <code>lib/jsonlogger_tcp.ex</code>. The first step is to launch a TCP connection to our logstash host, with configurable host/port.</p>
 
@@ -613,7 +613,7 @@ iex(1)&gt; :observer.start()
 :ok
 </code></pre>
 
-<p><img src="https://tobiasara.com/img/blog/elixir-logstash-json/observer_tcpworkers.png" alt="Application tree" /></p>
+<p><img src="http://tobiasara.com/img/blog/elixir-logstash-json/observer_tcpworkers.png" alt="Application tree" /></p>
 
 <p>Finally, we again edit <code>log/2</code>, this time to push logs to our queue:</p>
 
@@ -640,7 +640,7 @@ iex(1)&gt; :observer.start()
 
                 <br>
                 
-                <p class="back-to-posts"><a href="https://tobiasara.com/blog">Back to posts</a></p>
+                <p class="back-to-posts"><a href="http://tobiasara.com/blog">Back to posts</a></p>
             </div>
             <br>
             <div class="disqus">

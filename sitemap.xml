@@ -3,44 +3,44 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>https://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/</loc>
+    <loc>http://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/</loc>
     <lastmod>2018-07-21T17:04:34+02:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/fixed/about/</loc>
+    <loc>http://tobiasara.com/fixed/about/</loc>
     <lastmod>2018-07-06T20:34:45+02:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/blog/how-to-avoid-exhausting-arguments-and-get-things-done/</loc>
+    <loc>http://tobiasara.com/blog/how-to-avoid-exhausting-arguments-and-get-things-done/</loc>
     <lastmod>2018-07-06T15:51:10+02:00</lastmod>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/blog/</loc>
+    <loc>http://tobiasara.com/blog/</loc>
     <lastmod>2018-07-21T17:04:34+02:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/categories/</loc>
+    <loc>http://tobiasara.com/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/fixed/</loc>
+    <loc>http://tobiasara.com/fixed/</loc>
     <lastmod>2018-07-06T20:34:45+02:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/tags/</loc>
+    <loc>http://tobiasara.com/tags/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://tobiasara.com/</loc>
+    <loc>http://tobiasara.com/</loc>
     <lastmod>2018-07-21T17:04:34+02:00</lastmod>
     <priority>0</priority>
   </url>
