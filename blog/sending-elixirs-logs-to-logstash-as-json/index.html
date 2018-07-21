@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="author" content="Tobias Ara Svensson">
+<meta name="description" content="Adopting Elixir was a pleasure - it fit nicely into our microservice architecture and most of our tech stack. The only missing piece was our ELK-based logging infrastructure, where we sent logs to Logstash formatted in JSON, an easily machine-readable format. As there was no library at the time that did this, I decided to write one myself!
+In this post, we will cover how to create your own Elixir logger backend, how to send JSON logs to Logstash via TCP, unit testing, and strategies for handling log spikes.">
+
+<meta property="og:title" content="Sending Elixir&#39;s logs to Logstash as JSON" />
+<meta property="og:description" content="Adopting Elixir was a pleasure - it fit nicely into our microservice architecture and most of our tech stack. The only missing piece was our ELK-based logging infrastructure, where we sent logs to Logstash formatted in JSON, an easily machine-readable format. As there was no library at the time that did this, I decided to write one myself!
+In this post, we will cover how to create your own Elixir logger backend, how to send JSON logs to Logstash via TCP, unit testing, and strategies for handling log spikes." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/" />
+
+
+
+<meta property="article:published_time" content="2018-07-21T17:04:34&#43;02:00"/>
+
+<meta property="article:modified_time" content="2018-07-21T17:04:34&#43;02:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+<title>
+
+
+     Sending Elixir&#39;s logs to Logstash as JSON 
+
+</title>
+<link rel="canonical" href="https://tobiasara.com/blog/sending-elixirs-logs-to-logstash-as-json/">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css">
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:500">
+
+
+
+    
+    <link rel="stylesheet" href="https://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
+    <link rel="stylesheet" href="https://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
+    <link rel="stylesheet" href="https://tobiasara.com/css/main.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
+    
+        <link rel="stylesheet" href="https://tobiasara.com/css/override.css?t=2018-07-21%2017%3a17%3a17.912036674%20%2b0200%20CEST%20m%3d%2b0.046286427">
+    
+
+
+
+
+<link rel="shortcut icon"
+
+    href="https://tobiasara.com/img/favicon.ico"
+
+>
+
+
+
+
+
+
+
+
+</head>
+
+
+<body lang="en">
+
+<section class="header">
+    <div class="container">
+        <div class="content">
+            
+                
+                
+                
+                
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                
+                <a href="https://tobiasara.com/"><img class="avatar" src="https://tobiasara.com/img/avatar_bw_thumb.jpg" srcset="https://tobiasara.com/img/avatar_bw_thumb.jpg 1x"></a>
+            
+            <a href="https://tobiasara.com/"><div class="name">Tobias Ara Svensson</div></a>
+            
+              <h3 class="self-intro">simpler is better</h3>
+            
+            <nav>
+                <ul>
+                    
+                        <li class="nav-blog"><a href="https://tobiasara.com/blog/"><span>Blog</span></a></li>
+                    
+                        <li class="nav-code"><a href="https://tobiasara.com/code/"><span>Code</span></a></li>
+                    
+                        <li class="nav-about"><a href="https://tobiasara.com/fixed/about/"><span>About</span></a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="icons">
+    <div class="container">
+        <div class="content">
+        
+            <a href="//github.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/github.svg" alt="github" /></a>
+        
+
+        
+
+        
+            <a href="//twitter.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/twitter.svg" alt="twitter" /></a>
+        
+
+	
+
+        
+
+        
+
+        
+            <a href="//linkedin.com/in/svetob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/linkedin.svg" alt="linkedin" /></a>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+        </div>
+    </div>
+</section>
+
+
+<section class="main post non-narrow zero-top-spacing">
+    <div class="container">
+        <div class="content">
+            <div class="front-matter">
+                <div class="title-container">
+                    <div class="page-heading">
+
+    Sending Elixir&#39;s logs to Logstash as JSON
+
+</div>
+
+                    <div class="initials"><a href="https://tobiasara.com/">ad</a></div>
+                </div>
+                <div class="meta">
+                    
+                    <div class="date" title='Sat Jul 21 2018 17:04:34 CEST'>Jul 21, 2018</div>
+                    
+                    
+		    <div class="reading-time"><div class="middot"></div>9 minutes read</div>
+                    
+                </div>
+            </div>
+            <div class="markdown">
+                
+
+<p>Adopting Elixir was a pleasure - it fit nicely into our microservice architecture and most of our tech stack. The only missing piece was our <a href="https://www.elastic.co/elk-stack">ELK-based logging infrastructure</a>, where we sent logs to Logstash formatted in JSON, an easily machine-readable format. As there was no library at the time that did this, I decided to write one myself!</p>
+
+<p>In this post, we will cover how to create your own Elixir logger backend, how to send JSON logs to Logstash via TCP, unit testing, and strategies for handling log spikes.</p>
+
+<p>You can find <strong>logstash-json</strong> on <a href="https://github.com/svetob/logstash-json">GitHub</a>.</p>
+
+<h1 id="creating-an-elixir-logging-backend">Creating an Elixir logging backend</h1>
+
+<p>Let&rsquo;s start with the basics and, from an empty <code>mix new</code> project, create a simple console JSON logger.</p>
+
+<p>An Elixir Logger backend is simply a GenEvent event manager. So all we have to do is create an standard <code>:gen_event</code> event handler.</p>
+
+<p>First we need to handle initalization. Our logger should be configurable via <code>config.exs</code>, so on <code>init</code> we should read the application environment and store it in the logger&rsquo;s state. To make sure we handle restarts after errors without losing state, we persist the state back to the application environment. For now, the only parameter we need is the log level, which we can default to <code>:info</code>.</p>
+
+<p>We must also support reconfiguring the logger during runtime by handling the event <code>{:configure, opts}</code>.</p>
+
+<pre><code class="language-elixir"># lib/jsonlogger_console.ex
+
+defmodule JsonLogger.Console do
+  @moduledoc &quot;&quot;&quot;
+  Logger backend which logs to console in JSON format.
+  &quot;&quot;&quot;
+
+  @behaviour :gen_event
+
+  def init({__MODULE__, name}) do
+    {:ok, configure(name, [])}
+  end
+
+  def handle_call({:configure, opts}, %{name: name}) do
+    {:ok, :ok, configure(name, opts)}
+  end
+
+  defp configure(name, opts) do
+    env = Application.get_env(:logger, name, [])
+    opts = Keyword.merge(env, opts)
+    Application.put_env(:logger, name, opts)
+
+    level = Keyword.get(opts, :level, :info)
+
+    %{level: level, name: name}
+  end
+</code></pre>
+
+<p>Now we are ready to handle log messages!</p>
+
+<p>Log message events arrive in the format <code>{level, group_leader, {Logger, message, timestamp, metadata}}</code>. We should first compare the log level with our configuration to see if the message should be logged. Then we simply build our log message and print it to console. In this example i&rsquo;m using <a href="https://github.com/devinus/poison">Poison</a> to serialize the message to a JSON string.</p>
+
+<p>There is an interesting parameter called <code>group_leader</code>. Each BEAM process belongs to a group. Each group has a <a href="http://erlang.org/doc/man/erlang.html#group_leader-0">group leader</a> which handles all I/O for that group. According to the <a href="https://hexdocs.pm/logger/Logger.html#content">Logger documentation</a>:</p>
+
+<blockquote>
+<p>It is recommended that handlers ignore messages where the group leader is in a different node than the one where the handler is installed.</p>
+</blockquote>
+
+<p>The idea is logs from one node should not be printed to the console of another node. If we are logging to Logstash, we ignore this advice because all our logs are sent to an external system. Now we are printing to console though, so let&rsquo;s pattern match for this case.</p>
+
+<p>The only other noteworthy surprise here is the mind-numbing approach to getting the system timezone. Really, Elixir?</p>
+
+<pre><code class="language-elixir">  def handle_event({_level, group_leader, _info}, state)
+      when node(group_leader) != node() do
+    {:ok, state}
+  end
+
+  def handle_event({level, group_leader, {Logger, msg, ts, md}}, state) do
+    if Logger.compare_levels(level, state.level) != :lt do
+      log(event(level, msg, ts, md), state)
+    end
+    {:ok, state}
+  end
+
+  def handle_info(_msg, state) do
+    {:ok, state}
+  end
+
+  def event(level, message, timestamp, metadata) do
+    %{
+      &quot;@timestamp&quot;: format_date(timestamp) &lt;&gt; timezone(),
+      level: level,
+      message: to_string(message),
+      module: metadata[:module],
+      function: metadata[:function],
+      line: metadata[:line]
+    }
+  end
+
+  defp log(event, _state) do
+    case Poison.encode(event) do
+      {:ok, msg} -&gt;
+        IO.puts msg
+
+      {:error, reason} -&gt;
+        IO.puts &quot;Serialize error: #{inspect reason}, event: #{inspect event}&quot;
+    end
+  end
+
+  ## Timestamp shenanigans
+
+  defp format_date({{year, month, day}, {hour, min, sec, millis}}) do
+    {:ok, ndt} = NaiveDateTime.new(year, month, day,
+                                   hour, min, sec, {millis, 3})
+    NaiveDateTime.to_iso8601(ndt, :extended)
+  end
+
+  defp timezone() do
+    offset = timezone_offset()
+    minute = offset |&gt; abs() |&gt; rem(3600) |&gt; div(60)
+    hour   = offset |&gt; abs() |&gt; div(3600)
+    sign(offset) &lt;&gt; zero_pad(hour, 2) &lt;&gt; &quot;:&quot; &lt;&gt; zero_pad(minute, 2)
+  end
+
+  defp timezone_offset() do
+    t_utc = :calendar.universal_time()
+    t_local = :calendar.universal_time_to_local_time(t_utc)
+
+    s_utc = :calendar.datetime_to_gregorian_seconds(t_utc)
+    s_local = :calendar.datetime_to_gregorian_seconds(t_local)
+
+    s_local - s_utc
+  end
+
+  defp zero_pad(val, count) do
+    num = Integer.to_string(val)
+    :binary.copy(&quot;0&quot;, count - byte_size(num)) &lt;&gt; num
+  end
+
+  defp sign(total) when total &lt; 0, do: &quot;-&quot;
+  defp sign(_),                    do: &quot;+&quot;
+end
+</code></pre>
+
+<p>Now we can test our logging module! Let&rsquo;s update our <code>config.exs</code> file to use it:</p>
+
+<pre><code class="language-elixir"># config/config.exs
+
+use Mix.Config
+
+config :logger,
+  backends: [
+    {JsonLogger.Console, :console}
+  ]
+
+config :logger, :console,
+  level: :info
+</code></pre>
+
+<p>&hellip; and then quickly test it with <code>iex -S mix</code>:</p>
+
+<p><img src="https://tobiasara.com/img/blog/elixir-logstash-json/console_loggerbackend.png" alt="Console output" /></p>
+
+<p>Nice! Not the most human readable format though.</p>
+
+<p>The complete module, with some extra sprinkles on top, can be found <a href="https://github.com/svetob/logstash-json/blob/5f1fdce838b2b6e1732e63c920454409d73e4e9b/lib/logstash_json_console.ex">here</a>.</p>
+
+<h1 id="sending-logs-to-logstash-via-tcp">Sending logs to Logstash via TCP</h1>
+
+<p>Now, instead of printing to console, we want to sent these logs to Logstash.</p>
+
+<h2 id="setting-up-logstash-with-a-json-consumer">Setting up Logstash with a JSON consumer</h2>
+
+<p>First things first!</p>
+
+<p>To make this easy, here is a docker compose setup which starts Logstash locally, set up to read JSON input over TCP.</p>
+
+<p><code>docker-compose.yml</code></p>
+
+<pre><code>logstash:
+  image: docker.elastic.co/logstash/logstash:6.3.1
+  volumes:
+    - &quot;./docker/logstash.conf:/usr/share/logstash/pipeline/logstash.conf&quot;
+  ports:
+    - &quot;5044:5044&quot;
+  environment:
+    XPACK_MONITORING_ENABLED: &quot;false&quot;
+</code></pre>
+
+<p><code>docker/logstash.conf</code></p>
+
+<pre><code># docker/logstash.conf
+
+input {
+  tcp {
+    port =&gt; 5044
+    codec =&gt; json
+  }
+}
+output {
+  stdout {
+    codec =&gt; rubydebug
+  }
+}
+</code></pre>
+
+<p>Create these two files and run <code>docker-compose up</code>. Now you have a running Logstash instance, listening to JSON messages at TCP port 5044.</p>
+
+<h2 id="connection">Connection</h2>
+
+<p>Now we can begin building our TCP connection. Logstash&rsquo;s TCP interface is very simple, all we need to do is open a TCP socket and send newline-delimited JSON messages. But, we also need to nicely handle connection failures, service being unavailable and other expected errors. This should be a common problem, so perhaps there is already a solution available?</p>
+
+<p>Yup - <a href="https://github.com/fishcakez/connection">Connection</a>! This library is a behaviour for connection processes. It will handle connection, disconnection, attempt reconnection on errors and has an optional backoff between attempts. It even comes with a <a href="https://github.com/fishcakez/connection/blob/master/examples/tcp_connection/lib/tcp_connection.ex">TCP connection example</a> right out of the box. Just what we need! We will base our work on this example.</p>
+
+<p>You can test the example as is and see your logs arrive in logstash:</p>
+
+<p><img src="https://tobiasara.com/img/blog/elixir-logstash-json/console_tcpconnection.png" alt="TCPConnection to Logstash" /></p>
+
+<p>Let&rsquo;s modify our code to use this. Let&rsquo;s copy <code>lib/jsonlogger_console.ex</code> and create a new module, <code>JsonLogger.TCP</code> in <code>lib/jsonlogger_tcp.ex</code>. The first step is to launch a TCP connection to our logstash host, with configurable host/port.</p>
+
+<pre><code class="language-elixir"># lib/jsonlogger_tcp.ex
+
+defmodule JsonLogger.TCP do
+
+  # ...
+
+  defp configure(name, opts) do
+    env = Application.get_env(:logger, name, [])
+    opts = Keyword.merge(env, opts)
+    Application.put_env(:logger, name, opts)
+
+    level = Keyword.get(opts, :level, :info)
+    host = Keyword.get(opts, :host)
+    port = Keyword.get(opts, :port)
+    connection = Keyword.get(opts, :connection)
+
+    # Close previous connection
+    if connection != nil do
+      :ok = TCPConnection.close(connection)
+    end
+
+    {:ok, connection} = TCPConnection.start_link(host, port, [active: false, mode: :binary])
+
+    %{level: level, name: name, connection: connection}
+  end
+</code></pre>
+
+<p>Then we edit <code>log/2</code> to send the message to our TCP connection genserver:</p>
+
+<pre><code class="language-elixir"># lib/jsonlogger_tcp.ex
+
+  defp log(event, state) do
+    case Poison.encode(event) do
+      {:ok, msg} -&gt;
+        TCPConnection.send(state.connection, msg &lt;&gt; &quot;\n&quot;)
+
+      {:error, reason} -&gt;
+        IO.puts &quot;Serialize error: #{inspect reason}, event: #{inspect event}&quot;
+    end
+  end
+</code></pre>
+
+<p>&hellip;and update our <code>config.exs</code>:</p>
+
+<pre><code class="language-elixir"># config/config.exs
+
+use Mix.Config
+
+config :logger,
+  backends: [
+    {JsonLogger.Console, :json},
+    {JsonLogger.TCP, :logstash}
+  ]
+
+config :logger, :json,
+  level: :info
+
+config :logger, :logstash,
+  level: :debug,
+  host: 'localhost',
+  port: 5044
+</code></pre>
+
+<p>Note for <code>host: 'localhost'</code> that we use single quotes (<em>iolist</em>), not double quotes (<em>binary</em>) because this is what <code>:gen_tcp</code> expects.</p>
+
+<p>Now, you should be able to send logs and see them in Logstash&rsquo;s output.</p>
+
+<h2 id="pooling-and-buffering">Pooling and buffering</h2>
+
+<p>So far this works well, but it won&rsquo;t handle high throughput in a good way. There is only one connection, which limits log delivery speed. There is also no buffer on log messages, so any sudden increase in log volume will immediately throttle the application.</p>
+
+<p>This also brings us to the topic of handling large log volumes. If we produce logs faster than our backend can handle them, or if Logstash becomes temporarily unavailable, we will be faced with more logs than we can send or keep in memory.</p>
+
+<p>There is no middle ground here - if Logstash becomes unavailable or we produce too much logs too fast, we will have to either <strong>drop logs</strong> or risk <strong>blocking the application</strong> until we can successfully send more logs. Dropping logs when your message buffer fills up is normal. For our use case, it was important not to lose any logs, so we implemented blocking behaviour.</p>
+
+<p>Thus our next and final step is to create a pool of TCP connections, which read messages from a <a href="https://github.com/joekain/BlockingQueue">BlockingQueue</a>. Sizing the connection pool right will increase our throughput to Logstash, and the queue will act as a buffer to handle varying log volumes.</p>
+
+<p>We will need to modify our TCPConnection to read messages from a queue. We can do this by creating a worker process which reads from the queue and sends it to the TCPConnection process.</p>
+
+<p>Copy the TCPConnection example to your project and add this module to it:</p>
+
+<pre><code class="language-elixir"># lib/connection/tcp.ex
+
+defmodule TCPConnection.Worker do
+  @moduledoc &quot;&quot;&quot;
+  Worker that reads log messages from a BlockingQueue and writes them to
+  Logstash using a TCP connection.
+  &quot;&quot;&quot;
+
+  def start_link(conn, queue) do
+    spawn_link(fn -&gt; consume_messages(conn, queue) end)
+  end
+
+  defp consume_messages(conn, queue) do
+    msg = BlockingQueue.pop(queue)
+    TCPConnection.send(conn, msg)
+    consume_messages(conn, queue)
+  end
+end
+</code></pre>
+
+<p>Then we just need to start this worker process when the <code>TCPConnection</code> module intializes, with the following edits:</p>
+
+<pre><code class="language-elixir"># lib/connection/tcp.ex
+
+defmodule TCPConnection do
+
+  ...
+
+  def start_link(host, port, queue, opts \\ [], timeout \\ 5000) do
+    Connection.start_link(__MODULE__, {host, port, queue, opts, timeout})
+  end
+
+  def init({host, port, queue, opts, timeout}) do
+    TCPConnection.Worker.start_link(self(), queue)
+
+    state = %{host: host, port: port, opts: opts, timeout: timeout, sock: nil}
+    {:connect, :init, state}
+  end
+</code></pre>
+
+<p>If you would rather drop logs than block your application, you can change the BlockingQueue to any queue implementation which drops new messages when it hits max size.</p>
+
+<p>With these changes ready, we move back to <code>JsonLogger.TCP</code> to create a queue and a connection pool when the logger backend is started:</p>
+
+<pre><code class="language-elixir"># lib/jsonlogger_tcp.ex
+
+  # Standard tcp_connection socket options
+  @connection_opts [active: false, mode: :binary]
+
+  defp configure(name, opts) do
+    env = Application.get_env(:logger, name, [])
+    opts = Keyword.merge(env, opts)
+    Application.put_env(:logger, name, opts)
+
+    level = Keyword.get(opts, :level, :info)
+    host = Keyword.get(opts, :host)
+    port = Keyword.get(opts, :port)
+    queue = Keyword.get(opts, :queue) || nil
+    buffer_size = Keyword.get(opts, :buffer_size) || 10_000
+    workers = Keyword.get(opts, :workers) || 4
+    worker_pool = Keyword.get(opts, :worker_pool) || nil
+
+    # Create new queue
+    if queue == nil do
+      {:ok, queue} = BlockingQueue.start_link(buffer_size)
+    end
+
+    # Close previous worker pool
+    if worker_pool != nil do
+      :ok = Supervisor.stop(worker_pool)
+    end
+
+    # Create worker pool
+    children = 1..workers |&gt; Enum.map(&amp; tcp_worker(&amp;1, host, port, queue))
+    {:ok, worker_pool} = Supervisor.start_link(children,
+      [strategy: :one_for_one])
+
+    # Store opts in application env
+    opts = Keyword.merge(opts, [queue: queue, worker_pool: worker_pool])
+    Application.put_env(:logger, name, opts)
+
+    %{level: level, name: name, queue: queue}
+  end
+
+  defp tcp_worker(id, host, port, queue) do
+    Supervisor.Spec.worker(TCPConnection,
+      [host, port, queue, @connection_opts], id: id)
+  end
+</code></pre>
+
+<p>Now, if you start your application and open the BEAM observer, you should see your queue and connections up and running in the process tree.</p>
+
+<pre><code>$ iex -S mix
+
+iex(1)&gt; :observer.start()
+:ok
+</code></pre>
+
+<p><img src="https://tobiasara.com/img/blog/elixir-logstash-json/observer_tcpworkers.png" alt="Application tree" /></p>
+
+<p>Finally, we again edit <code>log/2</code>, this time to push logs to our queue:</p>
+
+<pre><code class="language-elixir"># lib/jsonlogger_tcp.ex
+
+  defp log(event, state) do
+    case Poison.encode(event) do
+      {:ok, msg} -&gt;
+        BlockingQueue.push(state.queue, msg &lt;&gt; &quot;\n&quot;)
+
+      {:error, reason} -&gt;
+        IO.puts &quot;Serialize error: #{inspect reason}, event: #{inspect event}&quot;
+    end
+  end
+</code></pre>
+
+<p>And we are done! Now you will see your JSON logs both on your console and appearing in Logstash&rsquo;s output.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We saw how to implement an Elixir Logger backend. We used <a href="https://github.com/fishcakez/connection">Connection</a> and its TCP connection example to send logs to Logstash as JSON via TCP. Finally we made our library faster and more resilient by creating a pool of TCP connection workers, reading messages from a <a href="https://github.com/joekain/BlockingQueue">BlockingQueue</a> message buffer.</p>
+
+<p>Thanks for reading!</p>
+
+                <br>
+                
+                <p class="back-to-posts"><a href="https://tobiasara.com/blog">Back to posts</a></p>
+            </div>
+            <br>
+            <div class="disqus">
+                <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "svetob" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-121678354-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/languages/elixir.min.js"></script>
+  
+
+  <script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+  </script>
+
+
+
+
+
+</body>
+</html>
+

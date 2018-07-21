@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta name="author" content="Tobias Ara Svensson">
+<meta name="description" content="Remember the last time you had a long, heated discussion and found a perfect solution? Me neither.
+Wouldn&rsquo;t it be amazing to have a better way to resolve arguments?
+I recall a particularly exhausting discussion that went on for over a month. Long ago I worked on large scale distributed system. At some point we found a potential issue that could lead to lost updates in our data sets.">
+
+<meta property="og:title" content="How to avoid exhausting arguments and get things done" />
+<meta property="og:description" content="Remember the last time you had a long, heated discussion and found a perfect solution? Me neither.
+Wouldn&rsquo;t it be amazing to have a better way to resolve arguments?
+I recall a particularly exhausting discussion that went on for over a month. Long ago I worked on large scale distributed system. At some point we found a potential issue that could lead to lost updates in our data sets." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tobiasara.com/blog/how-to-avoid-exhausting-arguments-and-get-things-done/" />
+
+
+
+<meta property="article:published_time" content="2018-07-06T15:51:10&#43;02:00"/>
+
+<meta property="article:modified_time" content="2018-07-06T15:51:10&#43;02:00"/>
+
+
+
+
+
+
+
+
+
+
+
+
+<title>
+
+
+     How to avoid exhausting arguments and get things done 
+
+</title>
+<link rel="canonical" href="https://tobiasara.com/blog/how-to-avoid-exhausting-arguments-and-get-things-done/">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/styles/default.min.css">
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700|Ubuntu+Mono:400,400i,700,700i|Raleway:500">
+
+
+
+    
+    <link rel="stylesheet" href="https://tobiasara.com/css/reset.css?t=2018-07-21%2017%3a17%3a17.912483891%20%2b0200%20CEST%20m%3d%2b0.046733643">
+    <link rel="stylesheet" href="https://tobiasara.com/css/pygments.css?t=2018-07-21%2017%3a17%3a17.912483891%20%2b0200%20CEST%20m%3d%2b0.046733643">
+    <link rel="stylesheet" href="https://tobiasara.com/css/main.css?t=2018-07-21%2017%3a17%3a17.912483891%20%2b0200%20CEST%20m%3d%2b0.046733643">
+    
+        <link rel="stylesheet" href="https://tobiasara.com/css/override.css?t=2018-07-21%2017%3a17%3a17.912483891%20%2b0200%20CEST%20m%3d%2b0.046733643">
+    
+
+
+
+
+<link rel="shortcut icon"
+
+    href="https://tobiasara.com/img/favicon.ico"
+
+>
+
+
+
+
+
+
+
+
+</head>
+
+
+<body lang="en">
+
+<section class="header">
+    <div class="container">
+        <div class="content">
+            
+                
+                
+                
+                
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                    
+                
+                
+                <a href="https://tobiasara.com/"><img class="avatar" src="https://tobiasara.com/img/avatar_bw_thumb.jpg" srcset="https://tobiasara.com/img/avatar_bw_thumb.jpg 1x"></a>
+            
+            <a href="https://tobiasara.com/"><div class="name">Tobias Ara Svensson</div></a>
+            
+              <h3 class="self-intro">simpler is better</h3>
+            
+            <nav>
+                <ul>
+                    
+                        <li class="nav-blog"><a href="https://tobiasara.com/blog/"><span>Blog</span></a></li>
+                    
+                        <li class="nav-code"><a href="https://tobiasara.com/code/"><span>Code</span></a></li>
+                    
+                        <li class="nav-about"><a href="https://tobiasara.com/fixed/about/"><span>About</span></a></li>
+                    
+                </ul>
+            </nav>
+        </div>
+    </div>
+</section>
+
+<section class="icons">
+    <div class="container">
+        <div class="content">
+        
+            <a href="//github.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/github.svg" alt="github" /></a>
+        
+
+        
+
+        
+            <a href="//twitter.com/SveTob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/twitter.svg" alt="twitter" /></a>
+        
+
+	
+
+        
+
+        
+
+        
+            <a href="//linkedin.com/in/svetob" target="_blank" rel="noopener"><img class="icon" src="https://tobiasara.com/img/linkedin.svg" alt="linkedin" /></a>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+        </div>
+    </div>
+</section>
+
+
+<section class="main post non-narrow zero-top-spacing">
+    <div class="container">
+        <div class="content">
+            <div class="front-matter">
+                <div class="title-container">
+                    <div class="page-heading">
+
+    How to avoid exhausting arguments and get things done
+
+</div>
+
+                    <div class="initials"><a href="https://tobiasara.com/">ad</a></div>
+                </div>
+                <div class="meta">
+                    
+                    <div class="date" title='Fri Jul 6 2018 15:51:10 CEST'>Jul 6, 2018</div>
+                    
+                    
+		    <div class="reading-time"><div class="middot"></div>4 minutes read</div>
+                    
+                </div>
+            </div>
+            <div class="markdown">
+                
+
+<p>Remember the last time you had a long, heated discussion and found a perfect solution? Me neither.</p>
+
+<p>Wouldn&rsquo;t it be amazing to have a better way to resolve arguments?</p>
+
+<p>I recall a particularly exhausting discussion that went on for over a month. Long ago I worked on large scale distributed system. At some point we found a potential issue that could lead to lost updates in our data sets.</p>
+
+<p>We had two solution ideas. One simple bare-minimum fix, the other a major coordination overhaul. In many ways they were direct opposites.</p>
+
+<p>&ldquo;We&rsquo;ve got to find the best solution&rdquo;, said someone. And just like that, all possible middle ground disintegrated into dust.</p>
+
+<p>We wrote design documents. We held meetings. We discussed and argued. But we couldn&rsquo;t find agreement. As weeks went on, frustration and resentment grew.</p>
+
+<p>What came of it? Nothing. After a month with no agreement, we jumped onto a new project, leaving the issue to gather mold in some corner. Our attempt to find the best solution through discussion had failed.</p>
+
+<p>What could we have done differently?</p>
+
+<h1 id="experiments-over-discussion">Experiments over Discussion</h1>
+
+<p>Engineering is about risks and unknowns, learning through trial and error when applying ideas to the real world. After testing and gaining information, you can rethink your approach and make it better. Why miss out on this process by defining everything in advance? Why handicap yourself?</p>
+
+<p>Instead of looking for the perfect solution, search for the most valuable <em>experiment</em>. What can you try quickly that will answer your biggest questions? How can you easily find useful information?</p>
+
+<p><img src="https://tobiasara.com/img/john-matychuk-479013-unsplash.jpg" alt="Photo by John Matychuk on Unsplash" /></p>
+
+<p>In our discussion, we had many unknowns. Would the issue be common or rare? How much money would it cost us? If we had said “Let’s find out how common this issue is” or “Let’s find out how if customers would notice the issue” we could have taken action.</p>
+
+<p>We would learn much later that the issue was very rare and had no proven customer impact. In short, it was not worth spending time on. If we had begun by gathering these facts, we could have saved ourselves a month of headache.</p>
+
+<h1 id="consent-over-consensus">Consent over Consensus</h1>
+
+<p>There was a fundamental issue at play in our months-long debate. For one solution to be “the best”, the other solution had to be less good. One side would have to lose face. There was no motivation for either side to yield any ground.</p>
+
+<p>Not only was the pursuit of agreement meaningless in finding the best solution. It was causing resentment, as team members risked losing face. It was wasting time, preventing us from learning.</p>
+
+<p>When looking for an experiment instead of a solution, you don’t actually need consensus. You just need <em>consent</em>. It’s okay not to agree, as long as a you find a way forward.</p>
+
+<p>If you’re having problems agreeing on an experiment, here are some suggestions for moving forward:</p>
+
+<ul>
+<li><p><strong>Which experiment will take least time?</strong> Small, effort-less experiments mean little risk. If a test will take less than an hour, just sit down and do it.</p></li>
+
+<li><p><strong>Who is willing to actually do the work?</strong> Trust your team mates to make the right call. So in practice, if Matt suggest a great experiment but only Lisa can actually spend time experimenting, let her choose what to spend time on.</p></li>
+
+<li><p><strong>Try both!</strong> If all else fails and you still can’t agree, just try all your ideas! Remember that the point is to learn and gather facts.</p></li>
+</ul>
+
+<h1 id="putting-it-all-together">Putting it all together</h1>
+
+<p>Fast forward to a few months later. We were facing repeated incidents and performance issues with an unstable data store. Maintenance costs were through the roof and attempts to scale it up had failed. Again, there were many paths forward. As discussion arose, I was eager to go anywhere but back to the same state we had been a few months ago.</p>
+
+<p>That afternoon, I suggested we try out the approach that was easiest to test. We hacked together a local test, replacing the database with an alternative one. It outperformed our production cluster on my laptop. There and then, discussion died. It didn&rsquo;t matter if this was the best way forward or not. What mattered was we had proof this would solve our problems.</p>
+
+<p>We were still unsure how it would scale. So, we began with what was most likely to fail - large-scale performance testing. After that, we would test fault tolerance, then maintenance tasks like adding nodes, and so on. Our big project became a series of small experiments. A third of the way through the project, we <em>knew for a fact</em> it would work at scale, handling failures gracefully.</p>
+
+<p>By testing in practice, assumptions became facts. As &ldquo;I think&rdquo; became &ldquo;I know&rdquo;, risk vanished and discussion with it.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>The next time you find yourselves at odds, aim for experiments over discussions. Look for consent over consensus. Spend your time learning instead of worrying.</p>
+
+                <br>
+                
+                <p class="back-to-posts"><a href="https://tobiasara.com/blog">Back to posts</a></p>
+            </div>
+            <br>
+            <div class="disqus">
+                <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "svetob" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+
+
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-121678354-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/highlight.min.js"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.11.0/languages/elixir.min.js"></script>
+  
+
+  <script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+  </script>
+
+
+
+
+
+</body>
+</html>
+
